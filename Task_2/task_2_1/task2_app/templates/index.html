@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      td,
+      th {
+        border: 1px solid #000000;
+        text-align: right;
+        padding: 9px;
+      }
+      tr:nth-child(even) {
+        background-color: #b1acac;
+      }
+      tr:nth-child(odd) {
+        background-color: #eae5e5;
+      }
+    </style>
+  </head>
+  <body>
+    <form method="post">
+      {% csrf_token %}
+      <label>Enter latitude: </label>{{form.latitude}}
+      <label>Enter longitude: </label>{{form.longitude}}
+      <button type="Submit">Get data</button>
+    </form>
+    {%if not data or data.status_code != 200 %}
+    <h1>No data found</h1>
+    {% else %}
+    <table>
+      <tr>
+        <th>Date and Time</th>
+        <th>
+          Temperature (in {{data.json.properties.meta.units.air_temperature}})
+        </th>
+        <th>
+          Humidity (in {{data.json.properties.meta.units.relative_humidity}})
+        </th>
+        <th>Wind Speed (in {{data.json.properties.meta.units.wind_speed}})</th>
+        <th>
+          Wind Direction (in
+          {{data.json.properties.meta.units.wind_from_direction}})
+        </th>
+        <th>
+          Air Pressure (in
+          {{data.json.properties.meta.units.air_pressure_at_sea_level}})
+        </th>
+      </tr>
+
+      {% for timeseries in data.json.properties.timeseries %}
+      <tr>
+        <td>{{timeseries.time}}</td>
+        <td>{{timeseries.data.instant.details.air_temperature}}</td>
+        <td>{{timeseries.data.instant.details.relative_humidity}}</td>
+        <td>{{timeseries.data.instant.details.wind_speed}}</td>
+        <td>{{timeseries.data.instant.details.wind_from_direction}}</td>
+        <td>{{timeseries.data.instant.details.air_pressure_at_sea_level}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </body>
+</html>
